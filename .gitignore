@@ -20,7 +20,7 @@ ENV/
 
 # ── Variables de entorno y configuración local ────────────────────────────────
 # NUNCA subir credenciales — usar .env.example como plantilla
-.env
+#.env
 *.env.local
 *.env.*.local
 
