@@ -1,0 +1,22 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.20:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [17/Nov/2026 22:29:22] "GET /api/nodo-info HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:22] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:22] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:22] "GET /app.js HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:22] "GET /api/nodo-info HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:23] "GET /api/clientes HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:23] "GET /api/tailscale HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:26] "GET /api/direcciones HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:28] "GET /api/tablas HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:43] "[36mGET / HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Nov/2026 22:29:43] "[36mGET /style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Nov/2026 22:29:43] "[36mGET /app.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [17/Nov/2026 22:29:43] "GET /api/nodo-info HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:43] "GET /api/clientes HTTP/1.1" 200 -
+127.0.0.1 - - [17/Nov/2026 22:29:43] "GET /api/tailscale HTTP/1.1" 200 -

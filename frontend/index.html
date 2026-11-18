@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Tiendas Distribuidas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar-brand">🏪 Tiendas Distribuidas</div>
+  <div class="navbar-links">
+    <a href="#" class="nav-link active" data-section="clientes">Clientes</a>
+    <a href="#" class="nav-link" data-section="direcciones">Direcciones</a>
+    <a href="#" class="nav-link" data-section="tablas">Tablas</a>
+  </div>
+  <div class="navbar-right">
+    <button id="btn-tailscale" class="btn-tailscale" onclick="abrirModalTailscale()" title="Estado de Tailscale">
+      <span id="ts-dot" class="ts-dot ts-dot--unknown"></span>
+      <span id="ts-label">Tailscale</span>
+    </button>
+    <div id="badge-nodo" class="badge-nodo">Cargando...</div>
+  </div>
+</nav>
+
+<!-- ═══ SECCIÓN CLIENTES ═════════════════════════════════════════════════════ -->
+<main id="section-clientes" class="section active">
+  <div class="toolbar">
+    <div class="search-bar">
+      <select id="campo-busqueda">
+        <option value="nombre">Nombre</option>
+        <option value="rfc">RFC</option>
+        <option value="domicilio">Domicilio</option>
+      </select>
+      <input type="text" id="input-busqueda" placeholder="Buscar..." />
+      <button class="btn btn-secondary" onclick="buscarClientes()">Buscar</button>
+      <button class="btn btn-ghost" onclick="listarTodos()">Listar todos</button>
+    </div>
+    <button id="btn-nuevo-cliente" class="btn btn-primary" onclick="abrirModalCrearCliente()">
+      + Nuevo Cliente
+    </button>
+  </div>
+
+  <div id="tabla-wrapper" class="table-wrapper">
+    <table id="tabla-clientes" class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>RFC</th>
+          <th>ID Dirección</th>
+          <th>Sucursal</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-clientes">
+        <tr><td colspan="6" class="empty">Cargando datos...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- ═══ SECCIÓN DIRECCIONES ══════════════════════════════════════════════════ -->
+<main id="section-direcciones" class="section">
+  <div class="toolbar">
+    <div class="search-bar">
+      <select id="campo-busqueda-dir">
+        <option value="calle">Calle</option>
+        <option value="colonia">Colonia</option>
+        <option value="estado">Estado</option>
+        <option value="cp">CP</option>
+      </select>
+      <input type="text" id="input-busqueda-dir" placeholder="Buscar dirección..." />
+      <button class="btn btn-secondary" onclick="buscarDirecciones()">Buscar</button>
+      <button class="btn btn-ghost" onclick="listarTodasDirecciones()">Listar todas</button>
+    </div>
+    <button class="btn btn-primary" onclick="abrirModalCrearDireccionIndep()">
+      + Nueva Dirección
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Calle y Número</th>
+          <th>Colonia</th>
+          <th>Estado</th>
+          <th>CP</th>
+          <th>ID Cliente</th>
+          <th>Sucursal</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-direcciones">
+        <tr><td colspan="8" class="empty">Cargando datos...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- ═══ SECCIÓN TABLAS ═══════════════════════════════════════════════════════ -->
+<main id="section-tablas" class="section">
+  <div class="toolbar">
+    <h2 class="section-title">Tablas en todos los nodos</h2>
+    <button class="btn btn-primary" onclick="abrirModalCrearTabla()">+ Nueva Tabla</button>
+  </div>
+  <div id="lista-tablas" class="tabla-cards">
+    <p class="empty">Cargando tablas...</p>
+  </div>
+</main>
+
+<!-- ═══ SECCIÓN CRUD DINÁMICO DE TABLA ═══════════════════════════════════════ -->
+<main id="section-crud-tabla" class="section">
+  <div class="toolbar">
+    <div>
+      <h2 id="crud-tabla-titulo" class="section-title">Tabla</h2>
+      <span id="crud-tabla-pk-info" class="field-hint"></span>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-left:auto">
+      <button class="btn btn-primary" onclick="abrirModalCrearRegistro()">+ Nuevo Registro</button>
+      <button class="btn btn-secondary" onclick="cargarRegistrosTabla()">↺ Actualizar</button>
+      <button class="btn btn-ghost" onclick="volverATablas()">← Volver a Tablas</button>
+    </div>
+  </div>
+  <div id="tabla-dinamica-wrapper" class="table-wrapper">
+    <p class="empty">Selecciona una tabla para comenzar.</p>
+  </div>
+</main>
+
+<!-- ═══ MODAL — Crear/Editar Cliente ════════════════════════════════════════ -->
+<div id="modal-cliente" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-cliente-titulo">Nuevo Cliente</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-cliente')">✕</button>
+    </div>
+    <form id="form-cliente" onsubmit="submitCliente(event)">
+      <input type="hidden" id="cliente-id" />
+      <div class="form-group">
+        <label>Nombre *</label>
+        <input type="text" id="cliente-nombre" required maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno *</label>
+        <input type="text" id="cliente-ap-pat" required maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno</label>
+        <input type="text" id="cliente-ap-mat" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label>RFC *</label>
+        <input type="text" id="cliente-rfc" required maxlength="50"
+               style="text-transform:uppercase" placeholder="Ej. ABCD000000XYZ o cualquier cadena" />
+        <span class="field-hint">Se acepta cualquier cadena de texto no vacía.</span>
+      </div>
+      <div class="form-group">
+        <label>ID de Dirección (opcional)</label>
+        <input type="number" id="cliente-id-dir" min="1" placeholder="Dejar vacío si no aplica" />
+        <span class="field-hint">ID de una dirección existente en el nodo local para asociar.</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="cerrarModal('modal-cliente')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Detalle de Cliente (Direcciones anidadas) ═══════════════════ -->
+<div id="modal-detalle" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3 id="modal-detalle-titulo">Direcciones</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-detalle')">✕</button>
+    </div>
+    <div id="detalle-info" class="detalle-info"></div>
+    <div class="toolbar toolbar-sm" style="padding:0 1.25rem">
+      <span class="section-title">Direcciones registradas</span>
+      <button id="btn-nueva-dir" class="btn btn-primary btn-sm" onclick="abrirModalCrearDireccion()">
+        + Nueva Dirección
+      </button>
+    </div>
+    <div id="lista-direcciones"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Crear/Editar Dirección (anidada en cliente) ═════════════════ -->
+<div id="modal-direccion" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-dir-titulo">Nueva Dirección</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-direccion')">✕</button>
+    </div>
+    <form id="form-direccion" onsubmit="submitDireccion(event)">
+      <input type="hidden" id="dir-id" />
+      <input type="hidden" id="dir-cliente-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Calle *</label>
+          <input type="text" id="dir-calle" required maxlength="120" />
+        </div>
+        <div class="form-group form-group-sm">
+          <label>Número *</label>
+          <input type="text" id="dir-numero" required maxlength="20" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Colonia *</label>
+        <input type="text" id="dir-colonia" required maxlength="100" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estado *</label>
+          <input type="text" id="dir-estado" required maxlength="100" />
+        </div>
+        <div class="form-group form-group-sm">
+          <label>CP *</label>
+          <input type="text" id="dir-cp" required maxlength="5" minlength="5"
+                 pattern="\d{5}" placeholder="00000" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="cerrarModal('modal-direccion')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Crear/Editar Dirección (independiente) ══════════════════════ -->
+<div id="modal-direccion-indep" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-dir-indep-titulo">Nueva Dirección</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-direccion-indep')">✕</button>
+    </div>
+    <form id="form-direccion-indep" onsubmit="submitDireccionIndep(event)">
+      <input type="hidden" id="dir-indep-id" />
+      <div class="form-row">
+        <div class="form-group">
+          <label>Calle *</label>
+          <input type="text" id="dir-indep-calle" required maxlength="120" />
+        </div>
+        <div class="form-group form-group-sm">
+          <label>Número *</label>
+          <input type="text" id="dir-indep-numero" required maxlength="20" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Colonia *</label>
+        <input type="text" id="dir-indep-colonia" required maxlength="100" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estado *</label>
+          <input type="text" id="dir-indep-estado" required maxlength="100" />
+        </div>
+        <div class="form-group form-group-sm">
+          <label>CP *</label>
+          <input type="text" id="dir-indep-cp" required maxlength="5" minlength="5"
+                 pattern="\d{5}" placeholder="00000" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ID Cliente (opcional)</label>
+        <input type="number" id="dir-indep-cliente-id" min="1"
+               placeholder="Dejar vacío si no aplica" />
+        <span class="field-hint">Asociar a un cliente existente en el nodo local.</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="cerrarModal('modal-direccion-indep')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Crear Tabla Distribuida ═════════════════════════════════════ -->
+<div id="modal-tabla" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3>Nueva Tabla Distribuida</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-tabla')">✕</button>
+    </div>
+    <form id="form-tabla" onsubmit="submitTabla(event)">
+      <div class="form-group">
+        <label>Nombre de la tabla *</label>
+        <input type="text" id="tabla-nombre" required pattern="[a-zA-Z_][a-zA-Z0-9_]*"
+               placeholder="mi_tabla" />
+        <span class="field-hint">Solo letras, números y guión bajo. Debe iniciar con letra o _</span>
+      </div>
+      <div class="columnas-header">
+        <span>Columnas</span>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="agregarColumna()">+ Columna</button>
+      </div>
+      <div id="columnas-container"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="cerrarModal('modal-tabla')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear en todos los nodos</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Crear/Editar Registro en tabla dinámica ════════════════════ -->
+<div id="modal-registro" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3 id="modal-registro-titulo">Nuevo Registro</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-registro')">✕</button>
+    </div>
+    <form id="form-registro" onsubmit="submitRegistro(event)">
+      <input type="hidden" id="registro-pk-valor" />
+      <div id="form-registro-campos" style="padding:0.5rem 1.25rem"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="cerrarModal('modal-registro')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Estado Tailscale ════════════════════════════════════════════ -->
+<div id="modal-tailscale" class="modal-overlay hidden">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3>Estado de Tailscale</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-tailscale')">✕</button>
+    </div>
+    <div id="ts-modal-body" class="ts-modal-body">
+      <p class="empty">Consultando estado...</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cargarTailscale()">↺ Actualizar</button>
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-tailscale')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
