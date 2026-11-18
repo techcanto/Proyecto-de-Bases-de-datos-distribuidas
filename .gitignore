@@ -1,0 +1,56 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.whl
+
+# ── Entornos virtuales ────────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# ── Variables de entorno y configuración local ────────────────────────────────
+# NUNCA subir credenciales — usar .env.example como plantilla
+.env
+*.env.local
+*.env.*.local
+
+# ── Logs y archivos de proceso ────────────────────────────────────────────────
+backend.log
+backend.pid
+*.log
+*.pid
+
+# ── Bases de datos locales ────────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Editores e IDEs ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Dependencias instaladas ───────────────────────────────────────────────────
+node_modules/
+
+# ── Archivos del sistema operativo ───────────────────────────────────────────
+desktop.ini
+
+# ── Entorno virtual (la_toño_prueba) ─────────────────────────────────────────
+la_toño_prueba/
+toñoproyecto/
+*.egg-link
